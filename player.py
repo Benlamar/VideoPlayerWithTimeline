@@ -33,13 +33,14 @@ class MainWindow(QMainWindow):
         # audio and mediaplayer init
         self._audio_output = QAudioOutput()
         self._player = QMediaPlayer()
+        self._player.setAudioOutput(self._audio_output)
 
         # adding the menu
-        menu = self.ui.menubar
+        file_menu = self.ui.menubar.addMenu("&File")
         icon = QIcon.fromTheme("document-open")
         open_action = QAction(icon, "&Open...", self,
                               shortcut=QKeySequence.Open, triggered=self.open)
-
+        file_menu.addAction(open_action)
         # adding the video widget
         self._video_widget = QVideoWidget()
         self._player.setVideoOutput(self._video_widget)
@@ -56,6 +57,10 @@ class MainWindow(QMainWindow):
         volume = self._audio_output.volume() * 100
         self.ui.volumeSlider.setValue(volume)
         self.ui.volumeSlider.valueChanged.connect(self.setAudioVolume)
+
+        # video progress
+        self._player.durationChanged.connect(self.durationUpdate)
+        self._player.positionChanged.connect(self.positionUpdate)
 
 
     # open options currently only single files
@@ -96,6 +101,14 @@ class MainWindow(QMainWindow):
     # change volume when change
     def setAudioVolume(self, value):
         self._audio_output.setVolume(value/100)
+
+    # vidoe progress update
+    def durationUpdate(self, duration):
+        print("Duration", duration)
+
+    def positionUpdate(self, pos):
+        pass
+        # print("position",pos)
 
 
 if __name__ == "__main__":

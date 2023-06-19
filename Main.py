@@ -76,7 +76,7 @@ class Ui_MainWindow(object):
         self.progressBar.setObjectName(u"progressBar")
         self.progressBar.setMaximumSize(QSize(16777215, 14))
         self.progressBar.setStyleSheet(u"background: None;")
-        self.progressBar.setValue(24)
+        self.progressBar.setValue(0)
         self.progressBar.setTextVisible(False)
 
         self.horizontalLayout.addWidget(self.progressBar)
@@ -185,12 +185,7 @@ class Ui_MainWindow(object):
         self.menubar.setObjectName(u"menubar")
         self.menubar.setGeometry(QRect(0, 0, 860, 21))
         MainWindow.setMenuBar(self.menubar)
-        self.toolBar = QToolBar(MainWindow)
-        self.toolBar.setObjectName(u"toolBar")
-        self.toolBar.setMovable(False)
-        self.toolBar.setAllowedAreas(Qt.AllToolBarAreas)
-        self.toolBar.setOrientation(Qt.Horizontal)
-        MainWindow.addToolBar(Qt.TopToolBarArea, self.toolBar)
+
 
         self.retranslateUi(MainWindow)
 
@@ -222,6 +217,5 @@ class Ui_MainWindow(object):
         self.playlistButton.setToolTip(QCoreApplication.translate("MainWindow", u"playlist", None))
 #endif // QT_CONFIG(tooltip)
         self.playlistButton.setText("")
-        self.toolBar.setWindowTitle(QCoreApplication.translate("MainWindow", u"toolBar", None))
     # retranslateUi
 
