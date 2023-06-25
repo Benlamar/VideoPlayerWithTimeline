@@ -52,7 +52,6 @@ class MainWindow(QMainWindow):
         self.ui.nextButton.clicked.connect(self.nextVideo)
         self.ui.previousButton.clicked.connect(self.previousVideo)
         
-
         # volume slider
         volume = self._audio_output.volume() * 100
         self.ui.volumeSlider.setValue(volume)
@@ -62,6 +61,12 @@ class MainWindow(QMainWindow):
         self._player.durationChanged.connect(self.durationUpdate)
         self._player.positionChanged.connect(self.positionUpdate)
 
+        self.video_slider = self.ui.videoSlider
+        # self.video_slider.valueChanged.connect(lambda x : print(x))
+
+
+        color_ranges = [(55/100, 60/100, "#ffbf31")]
+        self.video_slider.setColorRanges(color_ranges)
 
     # open options currently only single files
     @Slot()
@@ -88,7 +93,7 @@ class MainWindow(QMainWindow):
 
     # stop player
     def stopPlayer(self):
-        print("Stop")
+        self._player.stop()
 
     # next player
     def nextVideo(self):
@@ -104,10 +109,16 @@ class MainWindow(QMainWindow):
 
     # vidoe progress update
     def durationUpdate(self, duration):
-        print("Duration", duration)
+        self.video_slider.setMaximum(duration)
+        if duration >= 0:
+                self.ui.endTimeLabel.setText(str(duration))
+        # self.progress.setMaximum(duration)
 
     def positionUpdate(self, pos):
-        pass
+        self.video_slider.blockSignals(True)
+        self.video_slider.setValue(pos)
+        self.video_slider.blockSignals(False)
+        # self.progress.setValue(pos)
         # print("position",pos)
 
 

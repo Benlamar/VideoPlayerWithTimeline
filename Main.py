@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'main.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.5.0
+## Created by: Qt User Interface Compiler version 6.5.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -16,12 +16,11 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
-    QLabel, QMainWindow, QMenuBar, QProgressBar,
-    QPushButton, QSizePolicy, QSlider, QSpacerItem,
-    QToolBar, QVBoxLayout, QWidget)
+    QLabel, QMainWindow, QMenuBar, QPushButton,
+    QSizePolicy, QSlider, QSpacerItem, QVBoxLayout,
+    QWidget)
 
-import os
-PATH = os.path.dirname(__file__)
+from VideoSlider import VideoSlider
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -53,41 +52,113 @@ class Ui_MainWindow(object):
 "	background:None;\n"
 "}\n"
 "#bottomWidget{\n"
-"	background-color:rgb(216, 226, 229);\n"
+"	background-color:rgb(195, 195, 195);\n"
 "}")
         self.verticalLayout = QVBoxLayout(self.bottomWidget)
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
-        self.progressFrame = QFrame(self.bottomWidget)
-        self.progressFrame.setObjectName(u"progressFrame")
-        sizePolicy.setHeightForWidth(self.progressFrame.sizePolicy().hasHeightForWidth())
-        self.progressFrame.setSizePolicy(sizePolicy)
-        self.horizontalLayout = QHBoxLayout(self.progressFrame)
+        self.progressWidget = QWidget(self.bottomWidget)
+        self.progressWidget.setObjectName(u"progressWidget")
+        sizePolicy.setHeightForWidth(self.progressWidget.sizePolicy().hasHeightForWidth())
+        self.progressWidget.setSizePolicy(sizePolicy)
+#         self.progressWidget.setStyleSheet(u"QSlider::groove:horizontal {\n"
+# "	border: 1px solid #bbb;\n"
+# "	background: white;\n"
+# "	height: 6px;\n"
+# "	border-radius: 4px;\n"
+# "}\n"
+# "\n"
+# "QSlider::handle:horizontal {\n"
+# "	background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #eee, stop:1 #ccc);\n"
+# "	border: 1px solid #777;\n"
+# "\n"
+# "	width: 9px;\n"
+# "	margin-top: -2px;\n"
+# "	margin-bottom: -2px;\n"
+# "	border-radius: 5px;\n"
+# "\n"
+# "	\n"
+# "}\n"
+# "\n"
+# "QSlider::sub-page:horizontal {\n"
+# "	background: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1, stop: 0 #67bed0, stop: 1 #67bed0);\n"
+# "	background: qlineargradient(x1: 0, y1: 0.2, x2: 1, y2: 1,  stop: 0 #0800ec, stop: 1 #0800ec);\n"
+# "	border: 1px solid #777;\n"
+# "	height: 10px;\n"
+# "	border-radius: 4px;\n"
+# "}\n"
+# "\n"
+# "QSlider::add-page:horizontal {\n"
+# "	background: #fff;\n"
+# "	border: 1px solid #777;\n"
+# "	height: 10px;\n"
+# "	border-radius: 4px;\n"
+# "}\n"
+# "\n"
+# "\n"
+# "\n"
+# "QSlider::handle:horizontal:hover {\n"
+# "	background: qlineargradient(x1:0, y1:0, x2:1, y2:1,   stop:0 #fff, stop:1 #ddd);\n"
+# "	border: 1px solid #444;\n"
+# ""
+#                         "	width: 11px;\n"
+# "	margin-top: -3.5px;\n"
+# "	margin-bottom: -3.5px;\n"
+# "	border-radius: 5px;\n"
+# "}\n"
+# "\n"
+# "QSlider::sub-page:horizontal:disabled {\n"
+# "	background: #bbb;\n"
+# "	border-color: #999;\n"
+# "}\n"
+# "\n"
+# "QSlider::add-page:horizontal:disabled {\n"
+# "	background: #eee;\n"
+# "	border-color: #999;\n"
+# "}\n"
+# "\n"
+# "QSlider::handle:horizontal:disabled {\n"
+# "	background: #eee;\n"
+# "	border: 1px solid #aaa;\n"
+# "	border-radius: 4px;\n"
+# "}")
+        self.horizontalLayout = QHBoxLayout(self.progressWidget)
         self.horizontalLayout.setSpacing(8)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.horizontalLayout.setContentsMargins(12, 4, 12, 0)
-        self.startTimeLabel = QLabel(self.progressFrame)
+        self.startTimeLabel = QLabel(self.progressWidget)
         self.startTimeLabel.setObjectName(u"startTimeLabel")
 
         self.horizontalLayout.addWidget(self.startTimeLabel)
 
-        self.progressBar = QProgressBar(self.progressFrame)
-        self.progressBar.setObjectName(u"progressBar")
-        self.progressBar.setMaximumSize(QSize(16777215, 14))
-        self.progressBar.setStyleSheet(u"background: None;")
-        self.progressBar.setValue(0)
-        self.progressBar.setTextVisible(False)
+        self.videoSlider = VideoSlider(self.progressWidget)
+        self.videoSlider.setObjectName(u"videoSlider")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.videoSlider.sizePolicy().hasHeightForWidth())
+        self.videoSlider.setSizePolicy(sizePolicy1)
+        self.videoSlider.setMinimumSize(QSize(0, 0))
+        self.videoSlider.setMaximumSize(QSize(16777215, 16))
+        self.videoSlider.setAutoFillBackground(False)
+        self.videoSlider.setStyleSheet(u"")
+        # self.videoSlider.setValue(54)
+        # self.videoSlider.setSliderPosition(54)
+        self.videoSlider.setTracking(True)
+        self.videoSlider.setOrientation(Qt.Horizontal)
+        self.videoSlider.setInvertedAppearance(False)
+        self.videoSlider.setInvertedControls(False)
 
-        self.horizontalLayout.addWidget(self.progressBar)
+        self.horizontalLayout.addWidget(self.videoSlider)
 
-        self.endTimeLabel = QLabel(self.progressFrame)
+        self.endTimeLabel = QLabel(self.progressWidget)
         self.endTimeLabel.setObjectName(u"endTimeLabel")
 
         self.horizontalLayout.addWidget(self.endTimeLabel)
 
 
-        self.verticalLayout.addWidget(self.progressFrame)
+        self.verticalLayout.addWidget(self.progressWidget)
 
         self.controlFrame = QFrame(self.bottomWidget)
         self.controlFrame.setObjectName(u"controlFrame")
@@ -103,7 +174,7 @@ class Ui_MainWindow(object):
         self.playButton.setMaximumSize(QSize(34, 34))
         self.playButton.setBaseSize(QSize(30, 30))
         icon = QIcon()
-        icon.addFile(PATH+u"/play.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon.addFile(u"play.png", QSize(), QIcon.Normal, QIcon.Off)
         self.playButton.setIcon(icon)
         self.playButton.setFlat(True)
 
@@ -115,7 +186,7 @@ class Ui_MainWindow(object):
         self.stopButton.setMaximumSize(QSize(34, 34))
         self.stopButton.setBaseSize(QSize(30, 30))
         icon1 = QIcon()
-        icon1.addFile(PATH+u"/stop.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon1.addFile(u"stop.png", QSize(), QIcon.Normal, QIcon.Off)
         self.stopButton.setIcon(icon1)
         self.stopButton.setFlat(True)
 
@@ -127,7 +198,7 @@ class Ui_MainWindow(object):
         self.previousButton.setMaximumSize(QSize(34, 34))
         self.previousButton.setBaseSize(QSize(30, 30))
         icon2 = QIcon()
-        icon2.addFile(PATH+u"/previous.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon2.addFile(u"previous.png", QSize(), QIcon.Normal, QIcon.Off)
         self.previousButton.setIcon(icon2)
         self.previousButton.setFlat(True)
 
@@ -139,7 +210,7 @@ class Ui_MainWindow(object):
         self.nextButton.setMaximumSize(QSize(34, 34))
         self.nextButton.setBaseSize(QSize(30, 30))
         icon3 = QIcon()
-        icon3.addFile(PATH+u"/next.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon3.addFile(u"next.png", QSize(), QIcon.Normal, QIcon.Off)
         self.nextButton.setIcon(icon3)
         self.nextButton.setFlat(True)
 
@@ -154,7 +225,7 @@ class Ui_MainWindow(object):
         self.playlistButton.setMaximumSize(QSize(34, 34))
         self.playlistButton.setBaseSize(QSize(30, 30))
         icon4 = QIcon()
-        icon4.addFile(PATH+u"/playlist.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon4.addFile(u"playlist.png", QSize(), QIcon.Normal, QIcon.Off)
         self.playlistButton.setIcon(icon4)
         self.playlistButton.setIconSize(QSize(20, 20))
         self.playlistButton.setFlat(True)
@@ -186,7 +257,6 @@ class Ui_MainWindow(object):
         self.menubar.setGeometry(QRect(0, 0, 860, 21))
         MainWindow.setMenuBar(self.menubar)
 
-
         self.retranslateUi(MainWindow)
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -195,7 +265,6 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
         self.startTimeLabel.setText(QCoreApplication.translate("MainWindow", u"00:00:00", None))
-        self.progressBar.setFormat("")
         self.endTimeLabel.setText(QCoreApplication.translate("MainWindow", u"00:00:00", None))
 #if QT_CONFIG(tooltip)
         self.playButton.setToolTip(QCoreApplication.translate("MainWindow", u"play/pause", None))
