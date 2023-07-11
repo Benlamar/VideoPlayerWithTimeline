@@ -18,16 +18,18 @@ from PySide6.QtMultimedia import (QAudio, QAudioOutput, QMediaFormat,
                                   QMediaPlayer)
 from PySide6.QtMultimediaWidgets import QVideoWidget
 
-from Main import Ui_MainWindow
+# from Main import Ui_MainWindow
+from Main2 import Ui_mainWindow
+from Playlist import Playlist
+from Timeline import Timeline
 
 import sys
 import os
-PATH = os.path.dirname(__file__)
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.ui = Ui_MainWindow()
+        self.ui = Ui_mainWindow()
         self.ui.setupUi(self)
 
         # audio and mediaplayer init
@@ -51,6 +53,8 @@ class MainWindow(QMainWindow):
         self.ui.stopButton.clicked.connect(self.stopPlayer) 
         self.ui.nextButton.clicked.connect(self.nextVideo)
         self.ui.previousButton.clicked.connect(self.previousVideo)
+        self.ui.playlistButton.clicked.connect(self.showPlaylist)
+        self.ui.timelineButton.clicked.connect(self.showTimeline)
         
         # volume slider
         volume = self._audio_output.volume() * 100
@@ -83,10 +87,10 @@ class MainWindow(QMainWindow):
     # toggle play/pause
     def playPause(self):
         if self._player.isPlaying():
-            icon = PATH + "/pause.png"
+            icon = u":/images/icons/pause.png"
             self._player.pause()
         else:
-            icon = PATH + "/play.png"
+            icon = u":/images/icons/play.png"
             self._player.play()
         # toggle icons as well
         self.ui.playButton.setIcon(QIcon(icon))
@@ -107,7 +111,7 @@ class MainWindow(QMainWindow):
     def setAudioVolume(self, value):
         self._audio_output.setVolume(value/100)
 
-    # vidoe progress update
+    # videe progress update
     def durationUpdate(self, duration):
         self.video_slider.setMaximum(duration)
         if duration >= 0:
@@ -120,6 +124,14 @@ class MainWindow(QMainWindow):
         self.video_slider.blockSignals(False)
         # self.progress.setValue(pos)
         # print("position",pos)
+
+    def showPlaylist(self):
+        self.playlist = Playlist()
+        self.playlist.show()
+
+    def showTimeline(self):
+        self.timeline = Timeline()
+        self.timeline.show()
 
 
 if __name__ == "__main__":
