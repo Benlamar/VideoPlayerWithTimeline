@@ -12,7 +12,7 @@ This is a video player application built with PySide6, a Python binding for the 
 
 # Requirements
 - Python 3.7+
-- PySide6
+- QT 5
 
 ## install the required dependencies
 ```pip install PySide6```
