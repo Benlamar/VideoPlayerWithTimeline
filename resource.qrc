@@ -8,5 +8,6 @@
     <file>icons/playlist.png</file>
     <file>icons/previous.png</file>
     <file>icons/stop.png</file>
+    <file>icons/film.png</file>
   </qresource>
 </RCC>

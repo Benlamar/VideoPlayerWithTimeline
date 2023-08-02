@@ -8,23 +8,25 @@
 # WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QStandardPaths, Qt, Slot)
-from PySide6.QtGui import (QAction, QIcon, QKeySequence)
-from PySide6.QtWidgets import (QApplication, QMainWindow, QDialog, QFileDialog)
+from PyQt5 import QtGui
+from PyQt5.QtCore import Qt, QUrl
+from PyQt5.QtGui import QIcon, QKeySequence
+from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QApplication
 
 
 # multi media module
-from PySide6.QtMultimedia import (QAudio, QAudioOutput, QMediaFormat,
-                                  QMediaPlayer)
-from PySide6.QtMultimediaWidgets import QVideoWidget
+from PyQt5.QtMultimedia import (QAudio, QAudioOutput, QMediaPlayer, QMediaPlaylist, QMediaContent)
+from PyQt5.QtMultimediaWidgets import QVideoWidget
+
 
 # from Main import Ui_MainWindow
-from Main2 import Ui_mainWindow
-from Playlist import Playlist
+from Main import Ui_mainWindow
+from PlaylistView import PlaylistView
 from Timeline import Timeline
 
 import sys
-import os
+from pathlib import Path
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -33,10 +35,18 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
 
         # audio and mediaplayer init
-        self._audio_output = QAudioOutput()
+        # self._audio_output = QAudioOutput()
         self._player = QMediaPlayer()
-        self._player.setAudioOutput(self._audio_output)
+        # self._player.setAudioOutput(self._audio_output)
+        
+        self.playlist = QMediaPlaylist()
+        self._player.setPlaylist(self.playlist)
+        self.playlist.currentIndexChanged.connect(self.playlistPositionChanged)
 
+        self.playlistView = PlaylistView(self.playlist)
+        self.playlistView.video_list.doubleClicked.connect(self.playlistViewClicked)
+
+        self.timeline = Timeline()
         # adding the menu
         file_menu = self.ui.menubar.addMenu("&File")
         icon = QIcon.fromTheme("document-open")
@@ -57,7 +67,7 @@ class MainWindow(QMainWindow):
         self.ui.timelineButton.clicked.connect(self.showTimeline)
         
         # volume slider
-        volume = self._audio_output.volume() * 100
+        volume = self._player.volume()
         self.ui.volumeSlider.setValue(volume)
         self.ui.volumeSlider.valueChanged.connect(self.setAudioVolume)
 
@@ -68,25 +78,22 @@ class MainWindow(QMainWindow):
         self.video_slider = self.ui.videoSlider
         # self.video_slider.valueChanged.connect(lambda x : print(x))
 
-
-        color_ranges = [(55/100, 60/100, "#ffbf31")]
-        self.video_slider.setColorRanges(color_ranges)
+        # color_ranges = [(55/100, 60/100, "#ffbf31")]
+        # self.video_slider.setColorRanges(color_ranges)
 
     # open options currently only single files
-    @Slot()
     def open(self):
-        file_dialog = QFileDialog(self, directory='C:\\Users\\BLACK\\Desktop\\BLACK\\PyQT\\VideoSeek')
-        movies_location = QStandardPaths.writableLocation(QStandardPaths.MoviesLocation)
-        file_dialog.setDirectory(movies_location)
+        home = str(Path.home())
+        home_url = QUrl.fromLocalFile(home)
+        file_filter = "Video Files (*.mp4 *.avi *.mkv *.mov *.wmv)"
+        file_list, _ = QFileDialog.getOpenFileUrls(self, caption="Select video files", directory=home_url, filter=file_filter)
+        file_contents = [QMediaContent(content) for content in file_list]
 
-        if file_dialog.exec() == QDialog.Accepted:
-            url = file_dialog.selectedUrls()[0]
-            self._player.setSource(url)
-            self._player.play()
-
+        self.playlist.addMedia(file_contents)
+        
     # toggle play/pause
     def playPause(self):
-        if self._player.isPlaying():
+        if self._player.state() == QMediaPlayer.PlayingState:
             icon = u":/images/icons/pause.png"
             self._player.pause()
         else:
@@ -109,29 +116,68 @@ class MainWindow(QMainWindow):
 
     # change volume when change
     def setAudioVolume(self, value):
-        self._audio_output.setVolume(value/100)
+        self._player.setVolume(value)
 
     # videe progress update
     def durationUpdate(self, duration):
         self.video_slider.setMaximum(duration)
         if duration >= 0:
-                self.ui.endTimeLabel.setText(str(duration))
-        # self.progress.setMaximum(duration)
+            self.ui.endTimeLabel.setText(self.convert_milliseconds(duration))
 
     def positionUpdate(self, pos):
         self.video_slider.blockSignals(True)
         self.video_slider.setValue(pos)
         self.video_slider.blockSignals(False)
-        # self.progress.setValue(pos)
-        # print("position",pos)
+        self.ui.startTimeLabel.setText(self.convert_milliseconds(pos))
 
     def showPlaylist(self):
-        self.playlist = Playlist()
-        self.playlist.show()
+        if self.playlistView.isVisible():
+            self.playlistView.raise_()
+        else:
+            self.playlistView.show()
 
     def showTimeline(self):
-        self.timeline = Timeline()
-        self.timeline.show()
+        if self.timeline.isVisible():
+            self.timeline.raise_()
+        else:
+            self.timeline.show()
+
+
+    def _ensure_stopped(self):
+        if self._player.playbackState() != QMediaPlayer.StoppedState:
+            self._player.stop()
+
+    def hhmmss(self, ms):
+        # s = 1000
+        # m = 60000
+        # h = 360000
+        h, r = divmod(ms, 36000)
+        m, r = divmod(r, 60000)
+        s, _ = divmod(r, 1000)
+        return ("%d:%02d:%02d" % (h,m,s)) if h else ("%d:%02d" % (m,s))
+    
+    def convert_milliseconds(self, ms):
+        total_secs = ms // 1000
+        # Convert total seconds to hours, minutes, and remaining seconds
+        hours = total_secs // 3600
+        mins = (total_secs % 3600) // 60
+        secs = total_secs % 60
+        
+        # Use string formatting to ensure two digits for each unit of time
+        return f"{hours:02d}:{mins:02d}:{secs:02d}"
+        
+    def playlistPositionChanged(self, index):
+        if index > -1:
+            self.playlistView.playlistPositionChanged(index)
+
+    def playlistViewClicked(self):
+        self.video_slider.reset()
+        self.playlistView.itemClicked()
+
+    def closeEvent(self, event) -> None:
+        self.playlistView.close()
+        self.timeline.close()
+        self.close()
 
 
 if __name__ == "__main__":

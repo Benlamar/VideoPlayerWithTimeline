@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget
+from PyQt5.QtWidgets import QWidget
 from TimelineUI import Ui_TimelineNavigator
 
 class Timeline(QWidget):

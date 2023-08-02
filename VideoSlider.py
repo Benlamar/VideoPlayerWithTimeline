@@ -1,12 +1,15 @@
-from PySide6.QtWidgets import QSlider, QStyle, QStyleOptionSlider
-from PySide6.QtCore import Qt, QRect, QPoint
-from PySide6.QtGui import QPainter, QColor, QLinearGradient, QPainterPath
-import sys
+from PyQt5.QtWidgets import QSlider, QStyle, QStyleOptionSlider
+from PyQt5.QtCore import Qt, QRect, QPoint
+from PyQt5.QtGui import QPainter, QColor, QLinearGradient, QPainterPath
 
 class VideoSlider(QSlider):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.color_ranges = []
+        self.original_state = {
+            'range': (self.minimum(), self.maximum()),
+            'value': self.value(),
+        }
 
     def setColorRanges(self, color_ranges):
         self.color_ranges = color_ranges
@@ -51,11 +54,7 @@ class VideoSlider(QSlider):
                     groove_rect.height(),
                 )
 
-                painter.setBrush(QColor(color))
-                path = QPainterPath()
-
-                
-
+                painter.setBrush(QColor(color))              
             
                 painter.setBrush(QColor(color))
                 painter.drawRect(color_rect)
@@ -114,3 +113,12 @@ class VideoSlider(QSlider):
             self.setSliderPosition(new_position)
 
         super().mousePressEvent(event)
+
+    def reset(self):
+         # Reset to original state
+        self.setRange(*self.original_state['range'])
+        self.setValue(self.original_state['value'])
+
+        # Clear color_ranges
+        self.color_ranges = []
+        self.update()
