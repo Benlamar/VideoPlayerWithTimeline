@@ -43,11 +43,13 @@ class MainWindow(QMainWindow):
         # define a playlist viewer here
         self.playlistView = PlaylistView(self.playlist)
         self.playlistView.video_list.doubleClicked.connect(self.playlistViewClicked)
-        self.playlistView.hide()
+        self.playlistView.closeButton.clicked.connect(self.showPlaylist)
+        # self.playlistView.hide()
 
         # define a timeline list here
         self.timeline = Timeline()
-        self.timeline.hide()
+        self.timeline.closeButton.clicked.connect(self.showTimeline)
+        # self.timeline.hide()
 
         # adding the menu
         file_menu = self.ui.menubar.addMenu("&File")
@@ -141,13 +143,13 @@ class MainWindow(QMainWindow):
 
     def showPlaylist(self):
         if self.playlistView.isVisible():
-            self.playlistView.raise_()
+            self.playlistView.hide()
         else:
             self.playlistView.show()
 
     def showTimeline(self):
         if self.timeline.isVisible():
-            self.timeline.raise_()
+            self.timeline.hide()
         else:
             self.timeline.show()
 
@@ -189,6 +191,9 @@ class MainWindow(QMainWindow):
         self.timeline.close()
         self.close()
 
+    def showMinimized(self):
+        self.playlistView.hide()
+        self.timeline.hide()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

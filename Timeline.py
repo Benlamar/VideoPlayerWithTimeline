@@ -12,4 +12,19 @@ class Timeline(QWidget):
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
 
-        self.ui.closeButton.clicked.connect(self.hide)
+        self.closeButton = self.ui.closeButton
+
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.dragging = True
+            self.offset = event.pos()
+
+    def mouseMoveEvent(self, event):
+        if self.dragging:
+            self.move(self.pos() + event.pos() - self.offset)
+    
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            # Clear dragging flag
+            self.dragging = False

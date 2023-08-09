@@ -27,7 +27,11 @@ class PlaylistView(QWidget):
         self.model = PlaylistModel(self.playlist)
         self.video_list.setModel(self.model)
 
-        self.ui.closeButton.clicked.connect(self.hide)
+        self.closeButton = self.ui.closeButton
+    #     self.closeButton.clicked.connect(self.hidePlaylist)
+
+    # def hidePlaylist(self):
+    #     self.hide()
 
     def itemClicked(self):
         indexes = self.video_list.selectedIndexes()
@@ -37,3 +41,17 @@ class PlaylistView(QWidget):
     def playlistPositionChanged(self, index):
         pos = self.model.index(index)
         self.video_list.setCurrentIndex(pos)
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.dragging = True
+            self.offset = event.pos()
+
+    def mouseMoveEvent(self, event):
+        if self.dragging:
+            self.move(self.pos() + event.pos() - self.offset)
+    
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            # Clear dragging flag
+            self.dragging = False
