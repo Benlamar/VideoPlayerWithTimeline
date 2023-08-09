@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QWidget, QStyledItemDelegate
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize, Qt
 
 from PlaylistUI import Ui_Playlist
 from PlaylistModel import PlaylistModel
@@ -17,18 +17,21 @@ class PlaylistView(QWidget):
         self.ui = Ui_Playlist()
         self.ui.setupUi(self)
 
-        self.video_list = self.ui.listView
+        self.setAttribute(Qt.WA_StyledBackground, True)
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
 
+        self.video_list = self.ui.listView
         self.video_list.setItemDelegate(CustomDelegate())
 
         self.playlist = playlist
         self.model = PlaylistModel(self.playlist)
         self.video_list.setModel(self.model)
 
+        self.ui.closeButton.clicked.connect(self.hide)
+
     def itemClicked(self):
         indexes = self.video_list.selectedIndexes()
         for index in indexes:
-            print(index.row())
             self.playlist.setCurrentIndex(index.row())
 
     def playlistPositionChanged(self, index):

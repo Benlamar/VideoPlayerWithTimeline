@@ -7,17 +7,13 @@
 ##
 # WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
-
-from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, QUrl
 from PyQt5.QtGui import QIcon, QKeySequence
-from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QApplication
-
+from PyQt5.QtWidgets import QAction, QFileDialog, QMainWindow, QApplication, QStyle
 
 # multi media module
-from PyQt5.QtMultimedia import (QAudio, QAudioOutput, QMediaPlayer, QMediaPlaylist, QMediaContent)
+from PyQt5.QtMultimedia import (QMediaPlayer, QMediaPlaylist, QMediaContent)
 from PyQt5.QtMultimediaWidgets import QVideoWidget
-
 
 # from Main import Ui_MainWindow
 from Main import Ui_mainWindow
@@ -39,22 +35,29 @@ class MainWindow(QMainWindow):
         self._player = QMediaPlayer()
         # self._player.setAudioOutput(self._audio_output)
         
+        # define a playlist here
         self.playlist = QMediaPlaylist()
         self._player.setPlaylist(self.playlist)
         self.playlist.currentIndexChanged.connect(self.playlistPositionChanged)
 
+        # define a playlist viewer here
         self.playlistView = PlaylistView(self.playlist)
         self.playlistView.video_list.doubleClicked.connect(self.playlistViewClicked)
+        self.playlistView.hide()
 
+        # define a timeline list here
         self.timeline = Timeline()
+        self.timeline.hide()
+
         # adding the menu
         file_menu = self.ui.menubar.addMenu("&File")
         icon = QIcon.fromTheme("document-open")
         open_action = QAction(icon, "&Open...", self,
                               shortcut=QKeySequence.Open, triggered=self.open)
         file_menu.addAction(open_action)
+
         # adding the video widget
-        self._video_widget = QVideoWidget()
+        self._video_widget = QVideoWidget(self)
         self._player.setVideoOutput(self._video_widget)
         self.ui.videoLayout.addWidget(self._video_widget)
 
@@ -74,6 +77,7 @@ class MainWindow(QMainWindow):
         # video progress
         self._player.durationChanged.connect(self.durationUpdate)
         self._player.positionChanged.connect(self.positionUpdate)
+        self._player.stateChanged.connect(self.mediaStateChanged)
 
         self.video_slider = self.ui.videoSlider
         # self.video_slider.valueChanged.connect(lambda x : print(x))
@@ -94,21 +98,26 @@ class MainWindow(QMainWindow):
     # toggle play/pause
     def playPause(self):
         if self._player.state() == QMediaPlayer.PlayingState:
-            icon = u":/images/icons/pause.png"
             self._player.pause()
         else:
-            icon = u":/images/icons/play.png"
             self._player.play()
-        # toggle icons as well
-        self.ui.playButton.setIcon(QIcon(icon))
+
+
+    def mediaStateChanged(self, state):
+        if self._player.state() == QMediaPlayer.PlayingState:
+            self.ui.playButton.setIcon(QIcon(":/images/icons/play.png"))
+        else:
+            self.ui.playButton.setIcon(QIcon(":/images/icons/pause.png"))
 
     # stop player
     def stopPlayer(self):
+        self.video_slider.reset()
         self._player.stop()
 
     # next player
     def nextVideo(self):
         print("Next")
+        # self._player.stop()
 
     # next player
     def previousVideo(self):
@@ -142,9 +151,8 @@ class MainWindow(QMainWindow):
         else:
             self.timeline.show()
 
-
     def _ensure_stopped(self):
-        if self._player.playbackState() != QMediaPlayer.StoppedState:
+        if self._player.state() != QMediaPlayer.StoppedState:
             self._player.stop()
 
     def hhmmss(self, ms):
@@ -171,10 +179,12 @@ class MainWindow(QMainWindow):
             self.playlistView.playlistPositionChanged(index)
 
     def playlistViewClicked(self):
-        self.video_slider.reset()
+        self._ensure_stopped()
         self.playlistView.itemClicked()
 
     def closeEvent(self, event) -> None:
+        self._ensure_stopped()
+        self._player.disconnect()
         self.playlistView.close()
         self.timeline.close()
         self.close()

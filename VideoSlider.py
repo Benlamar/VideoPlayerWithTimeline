@@ -7,8 +7,8 @@ class VideoSlider(QSlider):
         super().__init__(parent)
         self.color_ranges = []
         self.original_state = {
-            'range': (self.minimum(), self.maximum()),
-            'value': self.value(),
+            'range': (0, 99),
+            'value': 0,
         }
 
     def setColorRanges(self, color_ranges):
@@ -34,12 +34,12 @@ class VideoSlider(QSlider):
 
             # Draw completed part
             completed_rect = QRect(
-                groove_rect.x(),
-                groove_rect.y(),
-                groove_rect.width() * self.sliderPosition() / self.maximum(),
-                groove_rect.height(),
+                int(groove_rect.x()),
+                int(groove_rect.y()),
+                int(groove_rect.width() * self.sliderPosition() / self.maximum()),
+                int(groove_rect.height()),
             )
-            # Set color
+
             # Create a linear gradient color
             painter.setBrush(QColor("#5e59ff"))
             painter.drawRoundedRect(completed_rect, 4, 4)
@@ -59,15 +59,24 @@ class VideoSlider(QSlider):
                 painter.setBrush(QColor(color))
                 painter.drawRect(color_rect)
 
-
             # Draw handle
             handle_rect = self.style().subControlRect(
                 QStyle.CC_Slider, self.styleOptionSlider(), QStyle.SC_SliderHandle, self
             )
-            handle_rect.moveCenter(QPoint(groove_rect.x(), groove_rect.y()+(groove_rect.height()-2.6))) #groove_rect.center()
+            handle_cor = QPoint(int(groove_rect.x()), int(groove_rect.y()+groove_rect.height()-2.6))
+
+            handle_rect.moveCenter(handle_cor) #groove_rect.center()
+
             # handle_rect.moveCenter(groove_rect.center()) #groove_rect.center()
             handle_position = groove_rect.left() + groove_rect.width() * self.sliderPosition() / self.maximum() - handle_rect.width() / 2
-            handle_rect.moveLeft(max(groove_rect.left(), min(handle_position, groove_rect.right() - (handle_rect.width())))-0.5)
+            min_handler_space = handle_rect.width()/2
+
+            if handle_position < int(min_handler_space):
+                handle_rect.moveLeft(0)
+            else:
+                handle_rect.moveLeft(int(handle_position)-int(handle_rect.width()/3))
+            
+            
             painter.setBrush(self.palette().color(self.foregroundRole()))
             painter.setPen(Qt.NoPen)
 
@@ -116,6 +125,7 @@ class VideoSlider(QSlider):
 
     def reset(self):
          # Reset to original state
+        print(self.original_state)
         self.setRange(*self.original_state['range'])
         self.setValue(self.original_state['value'])
 
