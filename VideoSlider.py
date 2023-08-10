@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QSlider, QStyle, QStyleOptionSlider
 from PySide6.QtCore import Qt, QRect, QPoint
-from PySide6.QtGui import QPainter, QColor, QLinearGradient, QPainterPath
+from PySide6.QtGui import QPainter, QColor, QPainterPath
 import sys
 
 class VideoSlider(QSlider):
@@ -52,23 +52,26 @@ class VideoSlider(QSlider):
                 )
 
                 painter.setBrush(QColor(color))
-                path = QPainterPath()
-
-                
-
             
                 painter.setBrush(QColor(color))
                 painter.drawRect(color_rect)
-
 
             # Draw handle
             handle_rect = self.style().subControlRect(
                 QStyle.CC_Slider, self.styleOptionSlider(), QStyle.SC_SliderHandle, self
             )
-            handle_rect.moveCenter(QPoint(groove_rect.x(), groove_rect.y()+(groove_rect.height()-2.6))) #groove_rect.center()
-            # handle_rect.moveCenter(groove_rect.center()) #groove_rect.center()
+
+            handle_cor = QPoint(int(groove_rect.x()), int(groove_rect.y()+groove_rect.height()-2.6))
+            handle_rect.moveCenter(handle_cor)
+
             handle_position = groove_rect.left() + groove_rect.width() * self.sliderPosition() / self.maximum() - handle_rect.width() / 2
-            handle_rect.moveLeft(max(groove_rect.left(), min(handle_position, groove_rect.right() - (handle_rect.width())))-0.5)
+            min_handler_space = handle_rect.width()/2
+
+            if handle_position < int(min_handler_space):
+                handle_rect.moveLeft(0)
+            else:
+                handle_rect.moveLeft(int(handle_position)-int(handle_rect.width()/3))
+
             painter.setBrush(self.palette().color(self.foregroundRole()))
             painter.setPen(Qt.NoPen)
 

@@ -1,14 +1,4 @@
-# -*- coding: utf-8 -*-
-
-################################################################################
-# Form generated from reading UI file 'main.ui'
-##
-# Created by: Qt User Interface Compiler version 6.5.1
-##
-# WARNING! All changes made in this file will be lost when recompiling UI file!
-################################################################################
-
-from PySide6.QtCore import (QStandardPaths, Qt, Slot)
+from PySide6.QtCore import (QStandardPaths, Qt, Slot, QUrl)
 from PySide6.QtGui import (QAction, QIcon, QKeySequence)
 from PySide6.QtWidgets import (QApplication, QMainWindow, QDialog, QFileDialog)
 
@@ -19,12 +9,12 @@ from PySide6.QtMultimedia import (QAudio, QAudioOutput, QMediaFormat,
 from PySide6.QtMultimediaWidgets import QVideoWidget
 
 # from Main import Ui_MainWindow
-from Main2 import Ui_mainWindow
+from Main import Ui_mainWindow
 from Playlist import Playlist
 from Timeline import Timeline
 
 import sys
-import os
+from pathlib import Path
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -43,14 +33,10 @@ class MainWindow(QMainWindow):
         open_action = QAction(icon, "&Open...", self,
                               shortcut=QKeySequence.Open, triggered=self.open)
         file_menu.addAction(open_action)
-        # adding the video widget
-        self._video_widget = QVideoWidget()
-        self._player.setVideoOutput(self._video_widget)
-        self.ui.videoLayout.addWidget(self._video_widget)
 
         # controls trigger
         self.ui.playButton.clicked.connect(self.playPause)
-        self.ui.stopButton.clicked.connect(self.stopPlayer) 
+        self.ui.stopButton.clicked.connect(self.ensureStopped) 
         self.ui.nextButton.clicked.connect(self.nextVideo)
         self.ui.previousButton.clicked.connect(self.previousVideo)
         self.ui.playlistButton.clicked.connect(self.showPlaylist)
@@ -66,38 +52,52 @@ class MainWindow(QMainWindow):
         self._player.positionChanged.connect(self.positionUpdate)
 
         self.video_slider = self.ui.videoSlider
-        # self.video_slider.valueChanged.connect(lambda x : print(x))
 
+        # color_ranges = [(55/100, 60/100, "#ffbf31")]
+        # self.video_slider.setColorRanges(color_ranges)
 
-        color_ranges = [(55/100, 60/100, "#ffbf31")]
-        self.video_slider.setColorRanges(color_ranges)
+        # adding the video widget
+        self._video_widget = QVideoWidget(self)
+        self._player.setVideoOutput(self._video_widget)
+        self.ui.videoLayout.addWidget(self._video_widget)
+
+        # playlist
+        self.playlist = Playlist()
+        self.playlist.signal.play_signal.connect(self.playnow)
+        # timeline
+        self.timeline = Timeline()
 
     # open options currently only single files
     @Slot()
     def open(self):
-        file_dialog = QFileDialog(self, directory='C:\\Users\\BLACK\\Desktop\\BLACK\\PyQT\\VideoSeek')
-        movies_location = QStandardPaths.writableLocation(QStandardPaths.MoviesLocation)
-        file_dialog.setDirectory(movies_location)
+        home = str(Path.home())
+        home_url = QUrl.fromLocalFile(home)
+        file_filter = "Video Files (*.mp4 *.avi *.mkv *.mov *.wmv)"
+        file_list, _ = QFileDialog.getOpenFileUrls(self, caption="Select video files", dir=home_url, filter=file_filter)
+        
+        if len(file_list):
+            self.playlist.addItemsToPlaylist(file_list)
 
-        if file_dialog.exec() == QDialog.Accepted:
-            url = file_dialog.selectedUrls()[0]
-            self._player.setSource(url)
-            self._player.play()
+    def playnow(self, url):
+        self._player.setSource(url)
+        self._player.play()
+        self.handleStateChange()
 
     # toggle play/pause
     def playPause(self):
-        if self._player.isPlaying():
-            icon = u":/images/icons/pause.png"
+        # print(self._player.playbackState(), QMediaPlayer.PlayingState)
+        if self._player.playbackState() == QMediaPlayer.PlayingState:
             self._player.pause()
         else:
-            icon = u":/images/icons/play.png"
             self._player.play()
-        # toggle icons as well
-        self.ui.playButton.setIcon(QIcon(icon))
+        self.handleStateChange()
 
-    # stop player
-    def stopPlayer(self):
-        self._player.stop()
+    def handleStateChange(self, current_state):
+        if current_state == QMediaPlayer.PlayingState:
+            icon = u":/images/icons/pause.png"
+        elif current_state == QMediaPlayer.PausedState:
+            icon = u":/images/icons/play.png"
+        self.ui.playButton.setIcon(QIcon(icon))
 
     # next player
     def nextVideo(self):
@@ -122,17 +122,47 @@ class MainWindow(QMainWindow):
         self.video_slider.blockSignals(True)
         self.video_slider.setValue(pos)
         self.video_slider.blockSignals(False)
-        # self.progress.setValue(pos)
-        # print("position",pos)
+        self.ui.startTimeLabel.setText(self.convert_milliseconds(pos))
+
+    def hhmmss(self, ms):
+        # s = 1000, #m = 60000, #h = 360000
+        h, r = divmod(ms, 36000)
+        m, r = divmod(r, 60000)
+        s, _ = divmod(r, 1000)
+        return ("%d:%02d:%02d" % (h,m,s)) if h else ("%d:%02d" % (m,s))
+    
+    def convert_milliseconds(self, ms):
+        total_secs = ms // 1000
+        # Convert total seconds to hours, minutes, and remaining seconds
+        hours = total_secs // 3600
+        mins = (total_secs % 3600) // 60
+        secs = total_secs % 60
+        
+        # Use string formatting to ensure two digits for each unit of time
+        return f"{hours:02d}:{mins:02d}:{secs:02d}"
 
     def showPlaylist(self):
-        self.playlist = Playlist()
-        self.playlist.show()
+        if self.playlist.isVisible():
+            self.playlist.hide()
+        else:
+            self.playlist.show()
+            self.playlist.raise_()
 
     def showTimeline(self):
-        self.timeline = Timeline()
-        self.timeline.show()
+        if self.timeline.isVisible():
+            self.timeline.hide()
+        else:
+            self.timeline.show()
 
+    def ensureStopped(self):
+        if self._player.playbackState() != QMediaPlayer.StoppedState:
+            self._player.stop()
+
+    def closeEvent(self, event) -> None:
+        self.ensureStopped()
+        self.playlist.close()
+        self.timeline.close()
+        self.close()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
