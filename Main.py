@@ -8,9 +8,7 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QRect,
-    QSize, Qt)
+from PySide6.QtCore import (QCoreApplication, QMetaObject, QRect, QSize, Qt)
 from PySide6.QtGui import (QIcon)
 from PySide6.QtWidgets import (QFrame, QGridLayout, QHBoxLayout,
     QLabel, QMenuBar, QPushButton,
