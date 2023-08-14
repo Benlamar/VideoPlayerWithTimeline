@@ -7,6 +7,10 @@ class VideoSlider(QSlider):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.color_ranges = []
+        self.original_state = {
+            'range': (0, 99),
+            'value': 0,
+        }
 
     def setColorRanges(self, color_ranges):
         self.color_ranges = color_ranges
@@ -68,7 +72,8 @@ class VideoSlider(QSlider):
             min_handler_space = handle_rect.width()/2
 
             if handle_position < int(min_handler_space):
-                handle_rect.moveLeft(0)
+                ## should be 
+                handle_rect.moveLeft(1)
             else:
                 handle_rect.moveLeft(int(handle_position)-int(handle_rect.width()/3))
 
@@ -117,3 +122,13 @@ class VideoSlider(QSlider):
             self.setSliderPosition(new_position)
 
         super().mousePressEvent(event)
+
+
+    def reset(self):
+         # Reset to original state
+        self.setRange(*self.original_state['range'])
+        self.setValue(self.original_state['value'])
+
+        # Clear color_ranges
+        self.color_ranges = []
+        self.update()

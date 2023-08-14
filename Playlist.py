@@ -1,11 +1,12 @@
 from PySide6.QtWidgets import QWidget, QStyledItemDelegate, QListView
-from PySide6.QtCore import Qt, QSize, Signal, QObject, QUrl
+from PySide6.QtCore import Qt, QSize, Signal, QObject, QUrl, QModelIndex
 
 from PlaylistUI import Ui_Playlist
 from PlaylistModel import PlaylistModel
 
 class Signals(QObject):
     play_signal = Signal(QUrl)
+    stop_signal = Signal()
 
 class CustomDelegate(QStyledItemDelegate):
     def sizeHint(self, option, index):
@@ -30,11 +31,10 @@ class Playlist(QWidget):
         self.video_list.doubleClicked.connect(self.itemClicked)
         self.video_list.setItemDelegate(CustomDelegate())
 
-        self.playlist_model = PlaylistModel()
-        
         self.ui.closeButton.clicked.connect(self.close)
 
     def addItemsToPlaylist(self, data):
+        self.playlist_model = PlaylistModel()
         existing_data = self.playlist_model.getplaylist()
 
         for item in data:
@@ -44,11 +44,52 @@ class Playlist(QWidget):
         self.playlist_model.populateData(existing_data)
         self.video_list.setModel(self.playlist_model)
 
+    def _playsignal(self, index):
+        item_url = self.playlist_model.getURL(index)
+        self.signal.play_signal.emit(item_url)
+
+    def _changePlaylistIndex(self, index):
+        model_index = self.video_list.model().index(index, 0)
+        self.video_list.setCurrentIndex(model_index)
+
     def itemClicked(self):
         index = self.video_list.selectedIndexes()
-        item_url = self.playlist_model.getURL(index[0].row())
-        self.signal.play_signal.emit(item_url)
-        
+        self._playsignal(index[0].row())
+
+    def playNext(self):
+        index = self.video_list.currentIndex().row()
+        rows = self.playlist_model.rowCount()
+                
+        if index < rows-1:
+            self._changePlaylistIndex(index+1)
+            self._playsignal(index+1)
+        elif index == rows-1:
+            self._changePlaylistIndex(-1)
+
+            self.signal.stop_signal.emit()
+
+    def play(self):
+        index = self.video_list.currentIndex().row()
+        row = self.playlist_model.rowCount()
+
+        if index < 0 and row != 0:
+            self._playsignal(0)
+            self._changePlaylistIndex(0)
+        elif row != 0:
+            self._playsignal(index)
+            self._changePlaylistIndex(index)
+
+    def playPrevious(self):
+        index = self.video_list.currentIndex().row()
+        # rows = self.playlist_model.rowCount()
+
+        if index > 0:
+            self._playsignal(index-1)
+            self._changePlaylistIndex(index-1)
+        elif index == 0:
+            self._playsignal(0)
+            self._changePlaylistIndex(0)
+
     def playlistPositionChanged(self, index):
         pos = self.model.index(index)
         self.video_list.setCurrentIndex(pos)

@@ -1,7 +1,7 @@
 from PySide6.QtCore import (QStandardPaths, Qt, Slot, QUrl)
 from PySide6.QtGui import (QAction, QIcon, QKeySequence)
 from PySide6.QtWidgets import (QApplication, QMainWindow, QDialog, QFileDialog)
-
+from time import sleep
 
 # multi media module
 from PySide6.QtMultimedia import (QAudio, QAudioOutput, QMediaFormat,
@@ -25,6 +25,7 @@ class MainWindow(QMainWindow):
         # audio and mediaplayer init
         self._audio_output = QAudioOutput()
         self._player = QMediaPlayer()
+
         self._player.setAudioOutput(self._audio_output)
 
         # adding the menu
@@ -64,6 +65,7 @@ class MainWindow(QMainWindow):
         # playlist
         self.playlist = Playlist()
         self.playlist.signal.play_signal.connect(self.playnow)
+        self.playlist.signal.stop_signal.connect(self.ensureStopped)
         # timeline
         self.timeline = Timeline()
 
@@ -72,40 +74,47 @@ class MainWindow(QMainWindow):
     def open(self):
         home = str(Path.home())
         home_url = QUrl.fromLocalFile(home)
-        file_filter = "Video Files (*.mp4 *.avi *.mkv *.mov *.wmv)"
+        file_filter = "ViStoppedStatedeo Files (*.mp4 *.avi *.mkv *.mov *.wmv)"
         file_list, _ = QFileDialog.getOpenFileUrls(self, caption="Select video files", dir=home_url, filter=file_filter)
         
         if len(file_list):
+            self.ensureStopped()
             self.playlist.addItemsToPlaylist(file_list)
 
     def playnow(self, url):
+        self.ensureStopped()
+        print("play video now")
         self._player.setSource(url)
         self._player.play()
-        self.handleStateChange()
+        self.handleStateChange(self._player.playbackState())
 
     # toggle play/pause
     def playPause(self):
-        # print(self._player.playbackState(), QMediaPlayer.PlayingState)
         if self._player.playbackState() == QMediaPlayer.PlayingState:
             self._player.pause()
-        else:
+        elif self._player.playbackState() == QMediaPlayer.PausedState:
             self._player.play()
-        self.handleStateChange()
+        elif self._player.playbackState() == QMediaPlayer.StoppedState:
+            self.playlist.play()
+        
+        self.handleStateChange(self._player.playbackState())
 
     def handleStateChange(self, current_state):
         if current_state == QMediaPlayer.PlayingState:
             icon = u":/images/icons/pause.png"
         elif current_state == QMediaPlayer.PausedState:
             icon = u":/images/icons/play.png"
+        elif current_state == QMediaPlayer.StoppedState:
+            icon = u":/images/icons/play.png"
         self.ui.playButton.setIcon(QIcon(icon))
 
     # next player
     def nextVideo(self):
-        print("Next")
+        self.playlist.playNext()
 
     # next player
     def previousVideo(self):
-        print("Previous")
+        self.playlist.playPrevious()
 
     # change volume when change
     def setAudioVolume(self, value):
@@ -115,7 +124,7 @@ class MainWindow(QMainWindow):
     def durationUpdate(self, duration):
         self.video_slider.setMaximum(duration)
         if duration >= 0:
-                self.ui.endTimeLabel.setText(str(duration))
+            self.ui.endTimeLabel.setText(self.convert_milliseconds(duration))
         # self.progress.setMaximum(duration)
 
     def positionUpdate(self, pos):
@@ -125,7 +134,7 @@ class MainWindow(QMainWindow):
         self.ui.startTimeLabel.setText(self.convert_milliseconds(pos))
 
     def hhmmss(self, ms):
-        # s = 1000, #m = 60000, #h = 360000
+        # s = 1000, # m = 60000, # h = 360000
         h, r = divmod(ms, 36000)
         m, r = divmod(r, 60000)
         s, _ = divmod(r, 1000)
@@ -153,10 +162,14 @@ class MainWindow(QMainWindow):
             self.timeline.hide()
         else:
             self.timeline.show()
+            h ="hello"
 
     def ensureStopped(self):
         if self._player.playbackState() != QMediaPlayer.StoppedState:
             self._player.stop()
+            self.video_slider.reset()
+            self.handleStateChange(self._player.playbackState())
+            print("ensure stoped ran")
 
     def closeEvent(self, event) -> None:
         self.ensureStopped()
