@@ -1,11 +1,10 @@
-from PySide6.QtCore import (QStandardPaths, Qt, Slot, QUrl)
+from PySide6.QtCore import (Slot, QUrl)
 from PySide6.QtGui import (QAction, QIcon, QKeySequence)
 from PySide6.QtWidgets import (QApplication, QMainWindow, QDialog, QFileDialog)
 from time import sleep
 
 # multi media module
-from PySide6.QtMultimedia import (QAudio, QAudioOutput, QMediaFormat,
-                                  QMediaPlayer)
+from PySide6.QtMultimedia import (QAudio, QAudioOutput, QMediaPlayer)
 from PySide6.QtMultimediaWidgets import QVideoWidget
 
 # from Main import Ui_MainWindow
@@ -25,7 +24,7 @@ class MainWindow(QMainWindow):
         # audio and mediaplayer init
         self._audio_output = QAudioOutput()
         self._player = QMediaPlayer()
-
+        
         self._player.setAudioOutput(self._audio_output)
 
         # adding the menu
@@ -54,13 +53,14 @@ class MainWindow(QMainWindow):
 
         self.video_slider = self.ui.videoSlider
 
-        # color_ranges = [(55/100, 60/100, "#ffbf31")]
-        # self.video_slider.setColorRanges(color_ranges)
-
         # adding the video widget
-        self._video_widget = QVideoWidget(self)
+        self._video_widget = QVideoWidget()
         self._player.setVideoOutput(self._video_widget)
         self.ui.videoLayout.addWidget(self._video_widget)
+
+        system_palette = self.palette()
+        highlight = system_palette.alternateBase()
+        # print(highlight.color().getRgb(), type(highlight.color().getRgb()))
 
         # playlist
         self.playlist = Playlist()
@@ -81,9 +81,13 @@ class MainWindow(QMainWindow):
             self.ensureStopped()
             self.playlist.addItemsToPlaylist(file_list)
 
-    def playnow(self, url):
+    def playnow(self, url):        
         self.ensureStopped()
-        print("play video now")
+        sleep(0.3)
+        
+        # color_ranges = [(55/100, 60/100, "#ffbf31")]
+        # self.video_slider.setColorRanges(color_ranges)
+
         self._player.setSource(url)
         self._player.play()
         self.handleStateChange(self._player.playbackState())
@@ -100,6 +104,7 @@ class MainWindow(QMainWindow):
         self.handleStateChange(self._player.playbackState())
 
     def handleStateChange(self, current_state):
+        # print("State",current_state)
         if current_state == QMediaPlayer.PlayingState:
             icon = u":/images/icons/pause.png"
         elif current_state == QMediaPlayer.PausedState:
@@ -122,12 +127,15 @@ class MainWindow(QMainWindow):
 
     # videe progress update
     def durationUpdate(self, duration):
-        self.video_slider.setMaximum(duration)
+        print("Duration ",duration)
         if duration >= 0:
             self.ui.endTimeLabel.setText(self.convert_milliseconds(duration))
-        # self.progress.setMaximum(duration)
+        if duration > 0:
+            self.video_slider.setMaximum(duration)
+
 
     def positionUpdate(self, pos):
+        # print("Position ",pos)
         self.video_slider.blockSignals(True)
         self.video_slider.setValue(pos)
         self.video_slider.blockSignals(False)
@@ -167,6 +175,7 @@ class MainWindow(QMainWindow):
     def ensureStopped(self):
         if self._player.playbackState() != QMediaPlayer.StoppedState:
             self._player.stop()
+            # self._player.disconnect()
             self.video_slider.reset()
             self.handleStateChange(self._player.playbackState())
             print("ensure stoped ran")

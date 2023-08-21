@@ -3,18 +3,19 @@
 ################################################################################
 ## Form generated from reading UI file 'playlist.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.4.2
+## Created by: Qt User Interface Compiler version 6.5.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QMetaObject,
-    QSize, Qt)
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import (QFrame, QGridLayout, QHBoxLayout,
-    QListView, QPushButton, QSizePolicy, QSpacerItem,
-    QVBoxLayout)
-
+from PySide6.QtCore import (QCoreApplication, QMetaObject, QSize, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
+    QLabel, QListView, QPushButton, QSizePolicy,
+    QSpacerItem, QVBoxLayout, QWidget)
 import resource_rc
 
 class Ui_Playlist(object):
@@ -25,9 +26,11 @@ class Ui_Playlist(object):
         Playlist.resize(240, 250)
         Playlist.setMinimumSize(QSize(240, 130))
         Playlist.setMaximumSize(QSize(260, 480))
-        Playlist.setStyleSheet(u"#Playlist{\n"
-"	background-color: rgb(26, 95, 180);\n"
-"}")
+        # system_palette = QApplication.palette()
+        # highlight_color = system_palette.color(QPalette.Highlight)
+        # highlight_color_str = f"rgb({highlight_color.red()}, {highlight_color.green()}, {highlight_color.blue()})"
+        # print("Playlist",highlight_color_str)
+        Playlist.setStyleSheet(u"#Playlist{ background-color: rgb(26, 95, 180); }")
         self.gridLayout = QGridLayout(Playlist)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
@@ -49,6 +52,20 @@ class Ui_Playlist(object):
         self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
+
+        self.label = QLabel(self.handleFrame)
+        self.label.setObjectName(u"label")
+        font = QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        self.label.setFont(font)
+        self.label.setStyleSheet(u"color:white;")
+
+        self.horizontalLayout.addWidget(self.label)
+
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout.addItem(self.horizontalSpacer_2)
 
         self.closeButton = QPushButton(self.handleFrame)
         self.closeButton.setObjectName(u"closeButton")
@@ -92,6 +109,7 @@ class Ui_Playlist(object):
 
     def retranslateUi(self, Playlist):
         Playlist.setWindowTitle(QCoreApplication.translate("Playlist", u"Playlist", None))
+        self.label.setText(QCoreApplication.translate("Playlist", u"Playlist", None))
         self.closeButton.setText("")
     # retranslateUi
 
