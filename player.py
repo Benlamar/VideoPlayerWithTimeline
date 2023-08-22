@@ -127,7 +127,6 @@ class MainWindow(QMainWindow):
 
     # videe progress update
     def durationUpdate(self, duration):
-        print("Duration ",duration)
         if duration >= 0:
             self.ui.endTimeLabel.setText(self.convert_milliseconds(duration))
         if duration > 0:

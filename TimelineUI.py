@@ -84,6 +84,14 @@ class Ui_TimelineNavigator(object):
 
         self.listView = QListView(self.verticalFrame)
         self.listView.setObjectName(u"listView")
+        self.listView.setMinimumSize(QSize(0, 0))
+        self.listView.setMaximumSize(QSize(16777215, 16777215))
+        self.listView.setDragEnabled(True)
+        self.listView.setMovement(QListView.Static)
+        self.listView.setProperty("isWrapping", False)
+        self.listView.setResizeMode(QListView.Fixed)
+        self.listView.setUniformItemSizes(True)
+        self.listView.setWordWrap(True)
 
         self.verticalLayout.addWidget(self.listView)
 
