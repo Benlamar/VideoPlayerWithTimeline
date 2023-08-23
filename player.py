@@ -74,7 +74,7 @@ class MainWindow(QMainWindow):
     def open(self):
         home = str(Path.home())
         home_url = QUrl.fromLocalFile(home)
-        file_filter = "ViStoppedStatedeo Files (*.mp4 *.avi *.mkv *.mov *.wmv)"
+        file_filter = "Supported Files (*.mp4 *.avi *.mkv *.mov *.wmv)"
         file_list, _ = QFileDialog.getOpenFileUrls(self, caption="Select video files", dir=home_url, filter=file_filter)
         
         if len(file_list):
@@ -87,6 +87,7 @@ class MainWindow(QMainWindow):
         
         # color_ranges = [(55/100, 60/100, "#ffbf31")]
         # self.video_slider.setColorRanges(color_ranges)
+        self.timeline.addItemsToTimeline(url)
 
         self._player.setSource(url)
         self._player.play()

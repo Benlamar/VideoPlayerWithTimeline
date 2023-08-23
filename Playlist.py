@@ -52,7 +52,7 @@ class Playlist(QWidget):
 
     def _playsignal(self, index):
         item_url = self.playlist_model.getURL(index)
-        print("Play now,", item_url)
+        # print("Play now,", item_url)
         self.signal.play_signal.emit(item_url)
 
     def _changePlaylistIndex(self, index):
