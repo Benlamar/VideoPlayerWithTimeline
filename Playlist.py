@@ -86,6 +86,7 @@ class Playlist(QWidget):
             elif row != 0:
                 self._playsignal(index)
                 self._changePlaylistIndex(index)
+        
 
     def playPrevious(self):
         if self.playlist_model:

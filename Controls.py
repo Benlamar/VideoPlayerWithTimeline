@@ -14,14 +14,19 @@ class Controls(QWidget):
         self.stop = self.ui.stopButton
         self.previous = self.ui.previousButton
         self.next = self.ui.nextButton
-        self.playlist_but = self.ui.playButton
+        self.playlist_but = self.ui.playlistButton
         self.timeline_but = self.ui.timelineButton
 
         self.volume_slider = self.ui.volumeSlider
         self.video_slider = self.ui.videoSlider
+        self.video_slider.sliderPressed.connect(self.seekVideo)
 
         self.start_label = self.ui.startTimeLabel
         self.end_label = self.ui.endTimeLabel
+
+    def seekVideo(self):
+        clicked_position = self.video_slider.value()
+        print(clicked_position)
 
     def resetVideoSlider(self):
         self.video_slider.reset()
@@ -36,7 +41,6 @@ class Controls(QWidget):
 
     # def updateVolumeSlider(self, value):
     #     self.volume_slider.valueChanged.connect(self.setAudioVolume)
-
 
     def updateVideoSlider(self, pos):
         self.video_slider.blockSignals(True)

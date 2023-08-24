@@ -20,7 +20,7 @@ class Player(QMainWindow):
         self.ui.setupUi(self)
 
         # player components
-        self.QVideoWidget = self.ui.videoWidget
+        self.video_widget = self.ui.videoWidget
 
         # add controls UI to ToolBar
         self.control_toolbar = self.ui.ControlBar
@@ -30,7 +30,7 @@ class Player(QMainWindow):
 
         # control components
         self.volume_slider = self.controls.volume_slider
-                
+                        
         # controls trigger
         self.controls.play_pause.clicked.connect(self.playPause)
         self.controls.stop.clicked.connect(self.ensureStopped) 
@@ -46,6 +46,7 @@ class Player(QMainWindow):
         self.playlist = Playlist()
         self.playlist.signal.play_signal.connect(self.playnow)
         self.playlist.signal.stop_signal.connect(self.ensureStopped)
+        
         # timeline
         self.timeline = Timeline()
 
@@ -94,9 +95,10 @@ class Player(QMainWindow):
         # color_ranges = [(55/100, 60/100, "#ffbf31")]
         # self.video_slider.setColorRanges(color_ranges)
         # self.timeline.addItemsToTimeline(url)
-        print("url -->",url)
+
         self._player.setSource(url)
         self._player.play()
+        
         self.handleStateChange(self._player.playbackState())
 
     # toggle play/pause
@@ -106,13 +108,11 @@ class Player(QMainWindow):
         elif self._player.playbackState() == QMediaPlayer.PausedState:
             self._player.play()
         elif self._player.playbackState() == QMediaPlayer.StoppedState:
-            pass
-            # self.playlist.play()
+            self.playlist.play()
         
         self.handleStateChange(self._player.playbackState())
 
     def handleStateChange(self, current_state):
-        # print("State",current_state)
         if current_state == QMediaPlayer.PlayingState:
             icon = u":/images/icons/pause.png"
         elif current_state == QMediaPlayer.PausedState:
@@ -153,7 +153,6 @@ class Player(QMainWindow):
             self.timeline.hide()
         else:
             self.timeline.show()
-            h ="hello"
 
     def ensureStopped(self):
         if self._player.playbackState() != QMediaPlayer.StoppedState:

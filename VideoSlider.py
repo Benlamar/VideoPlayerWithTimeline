@@ -128,7 +128,7 @@ class VideoSlider(QSlider):
          # Reset to original state
         self.setRange(*self.original_state['range'])
         self.setValue(self.original_state['value'])
-
+        
         # Clear color_ranges
         self.color_ranges = []
         self.update()

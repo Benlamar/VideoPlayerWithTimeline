@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'ControlsUI.ui'
+## Form generated from reading UI file 'controls.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.4.2
 ##
@@ -19,14 +19,14 @@ from PySide6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout, QLabel,
     QPushButton, QSizePolicy, QSlider, QSpacerItem,
     QWidget)
 import resource_rc
-
 from VideoSlider import VideoSlider
+
 
 class Ui_Form(object):
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
-        Form.resize(732, 57)
+        Form.resize(475, 59)
         self.gridLayout = QGridLayout(Form)
         self.gridLayout.setSpacing(0)
         self.gridLayout.setObjectName(u"gridLayout")
@@ -260,6 +260,9 @@ class Ui_Form(object):
         self.stopButton.setToolTip(QCoreApplication.translate("Form", u"stop", None))
 #endif // QT_CONFIG(tooltip)
         self.stopButton.setText("")
+#if QT_CONFIG(shortcut)
+        self.stopButton.setShortcut(QCoreApplication.translate("Form", u"S", None))
+#endif // QT_CONFIG(shortcut)
 #if QT_CONFIG(tooltip)
         self.previousButton.setToolTip(QCoreApplication.translate("Form", u"previous", None))
 #endif // QT_CONFIG(tooltip)
