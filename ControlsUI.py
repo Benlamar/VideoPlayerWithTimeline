@@ -27,6 +27,7 @@ class Ui_Form(object):
         if not Form.objectName():
             Form.setObjectName(u"Form")
         Form.resize(732, 57)
+        Form.setStyleSheet(u"#Form{background-color: rgb(238, 238, 238);}")
         self.gridLayout = QGridLayout(Form)
         self.gridLayout.setSpacing(0)
         self.gridLayout.setObjectName(u"gridLayout")

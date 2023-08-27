@@ -30,7 +30,7 @@ class VideoSlider(QSlider):
 
             # Draw default groove
             painter.setPen(Qt.NoPen)
-            painter.setBrush(self.palette().color(self.backgroundRole()))
+            painter.setBrush(QColor("#FFFFFF"))
             painter.drawRoundedRect(groove_rect,4, 4)
 
             # Draw completed part
