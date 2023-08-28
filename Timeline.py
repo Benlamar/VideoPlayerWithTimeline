@@ -35,30 +35,22 @@ class Timeline(QWidget):
         item = self.tl_model.getTimeline(index[0].row())
         print(item)
 
-    def readTimeStamp(self, file_path):
-        # incomplete
-        with open(file_path,'r') as r:
-            data = r.read()
-            return data
+    def addItemsToTimeline(self, file_url:list()):
+        print("Time -->",file_url)
+        # basename = os.path.basename(file_location)
+        # folder = os.path.dirname(file_location)
+        # file_split = basename.split(".")
+        # file_timestamp = file_split[0]+".txt"
 
-    def addItemsToTimeline(self, file_url:QUrl):
-        file_location = file_url.toLocalFile()
-        print(file_location)
-        basename = os.path.basename(file_location)
-        folder = os.path.dirname(file_location)
-        file_split = basename.split(".")
-        file_timestamp = file_split[0]+".txt"
+        # timestamp_path = os.path.join(folder, file_timestamp)
 
-        timestamp_path = os.path.join(folder, file_timestamp)
-
-        try:
-            if os.path.exists(timestamp_path):
-                print(self.readTimeStamp(timestamp_path))
-            else:
-                print("Timestamp file do not exist")
-        except Exception as ex:
-            print(ex)
-                
+        # try:
+        #     if os.path.exists(timestamp_path):
+        #         print(self.readTimeStamp(timestamp_path))
+        #     else:
+        #         print("Timestamp file do not exist")
+        # except Exception as ex:
+        #     print(ex)
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:

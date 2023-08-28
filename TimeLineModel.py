@@ -8,6 +8,10 @@ class TimeLineModel(QAbstractListModel):
 
     def rowCount(self, parent=QModelIndex()):
          return len(self._data)
+    
+    
+    def populateData(self,data):
+        self._data = data
 
     def data(self, index, role=Qt.DisplayRole):
         if role == Qt.DisplayRole:

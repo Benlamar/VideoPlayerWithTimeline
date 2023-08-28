@@ -1,7 +1,9 @@
-from typing import Optional
-import PySide6.QtCore
+from PySide6.QtCore import Signal, QObject
 from PySide6.QtWidgets import QWidget
 from ControlsUI import Ui_Form
+
+class Signals(QObject):
+    seek_pos = Signal(int)
 
 
 class Controls(QWidget):
@@ -19,15 +21,24 @@ class Controls(QWidget):
 
         self.volume_slider = self.ui.volumeSlider
         self.video_slider = self.ui.videoSlider
-        self.video_slider.sliderPressed.connect(self.seekVideo)
+        self.video_slider.sliderPressed.connect(self.sliderSeekClicked)
 
         self.start_label = self.ui.startTimeLabel
         self.end_label = self.ui.endTimeLabel
 
-    def seekVideo(self):
-        clicked_position = self.video_slider.value()
-        print(clicked_position)
+        self.signal = Signals()
 
+    def addTimeFrame(self, data:list()):
+        print("Controls -->", data)
+        # color_ranges = [(55/100, 60/100, "#ffbf31")]
+        # self.video_slider.setColorRanges(color_ranges)
+        # self.timeline.addItemsToTimeline(url)
+        # pass
+
+    def sliderSeekClicked(self):
+        clicked_position = self.video_slider.value()
+        self.signal.seek_pos.emit(clicked_position)
+        
     def resetVideoSlider(self):
         self.video_slider.reset()
 

@@ -1,12 +1,12 @@
-from PySide6.QtCore import (Slot, QUrl)
+from PySide6.QtCore import (Slot, QUrl, QThreadPool)
 from PySide6.QtWidgets import (QMainWindow, QFileDialog)
 from PySide6.QtGui import (QAction, QIcon, QKeySequence)
 from PySide6.QtMultimedia import (QAudio, QAudioOutput, QMediaPlayer)
-from PySide6.QtMultimediaWidgets import QVideoWidget
 
 from PlayerUI import Ui_mainWindow
 from Playlist import Playlist
 from Timeline import Timeline
+from ReadTimelineWorker import ReadTimelineWorker
 
 from Controls import Controls
 
@@ -25,6 +25,7 @@ class Player(QMainWindow):
         # add controls UI to ToolBar
         self.control_toolbar = self.ui.ControlBar
         self.controls = Controls()
+        self.controls.signal.seek_pos.connect(self.seekPosition)
         self.controls.setParent(self.control_toolbar)
         self.control_toolbar.addWidget(self.controls)
 
@@ -50,6 +51,10 @@ class Player(QMainWindow):
         # timeline
         self.timeline = Timeline()
 
+        # threadpool
+        self.pool = QThreadPool()
+
+
     def initializePlayer(self):
         # audio connections
         self._audio_output = QAudioOutput()
@@ -67,6 +72,10 @@ class Player(QMainWindow):
         # video progress
         self._player.durationChanged.connect(self.durationUpdate)
         self._player.positionChanged.connect(self.positionUpdate)
+
+    def seekPosition(self, position):
+        if self._player.playbackState() != QMediaPlayer.StoppedState:
+            self._player.setPosition(position)
 
     def setupMenu(self):
          # adding the menu
@@ -91,10 +100,10 @@ class Player(QMainWindow):
     def playnow(self, url):        
         self.ensureStopped()
         sleep(0.3)
-        
-        # color_ranges = [(55/100, 60/100, "#ffbf31")]
-        # self.video_slider.setColorRanges(color_ranges)
-        # self.timeline.addItemsToTimeline(url)
+
+        self.time_worker = ReadTimelineWorker(url)
+        self.time_worker.signal.time_list.connect(self.timeLineData)
+        self.pool.start(self.time_worker)
 
         self._player.setSource(url)
         self._player.play()
@@ -160,6 +169,13 @@ class Player(QMainWindow):
             self.controls.resetVideoSlider()
             self.handleStateChange(self._player.playbackState())
             print("ensure stoped ran")
+
+    
+    # this receives the data from the thread pool
+    def timeLineData(self, data):
+        # print(data)
+        self.controls.addTimeFrame(data)
+        self.timeline.addItemsToTimeline(data)
 
     def closeEvent(self, event) -> None:
         self.ensureStopped()

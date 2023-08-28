@@ -8,9 +8,8 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
+from PySide6.QtCore import (QCoreApplication, QMetaObject, QRect,
+    QSize, Qt)
 from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
@@ -63,6 +62,7 @@ class Ui_mainWindow(object):
         self.ControlBar.setSizePolicy(sizePolicy1)
         self.ControlBar.setMinimumSize(QSize(0, 60))
         self.ControlBar.setMaximumSize(QSize(16777215, 80))
+        self.ControlBar.setContextMenuPolicy(Qt.PreventContextMenu)
         self.ControlBar.setAutoFillBackground(True)
         self.ControlBar.setMovable(False)
         self.ControlBar.setFloatable(True)
