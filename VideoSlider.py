@@ -45,7 +45,6 @@ class VideoSlider(QSlider):
             painter.setBrush(QColor("#5e59ff"))
             painter.drawRoundedRect(completed_rect, 4, 4)
 
-            # print(groove_rect.x(), groove_rect.y(), groove_rect.width())
             # Draw color ranges
             for start, end, color in self.color_ranges:
                 color_rect = QRect(
@@ -54,9 +53,6 @@ class VideoSlider(QSlider):
                     groove_rect.width() * (end - start),
                     groove_rect.height(),
                 )
-
-                painter.setBrush(QColor(color))
-            
                 painter.setBrush(QColor(color))
                 painter.drawRect(color_rect)
 
@@ -72,7 +68,6 @@ class VideoSlider(QSlider):
             min_handler_space = handle_rect.width()/2
 
             if handle_position < int(min_handler_space):
-                ## should be 
                 handle_rect.moveLeft(1)
             else:
                 handle_rect.moveLeft(int(handle_position)-int(handle_rect.width()/3))
@@ -125,7 +120,7 @@ class VideoSlider(QSlider):
 
 
     def reset(self):
-         # Reset to original state
+        # Reset to original state
         self.setRange(*self.original_state['range'])
         self.setValue(self.original_state['value'])
         

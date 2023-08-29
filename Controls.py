@@ -1,6 +1,7 @@
 from PySide6.QtCore import Signal, QObject
 from PySide6.QtWidgets import QWidget
 from ControlsUI import Ui_Form
+import helper
 
 class Signals(QObject):
     seek_pos = Signal(int)
@@ -28,10 +29,19 @@ class Controls(QWidget):
 
         self.signal = Signals()
 
-    def addTimeFrame(self, data:list()):
-        print("Controls -->", data)
-        # color_ranges = [(55/100, 60/100, "#ffbf31")]
-        # self.video_slider.setColorRanges(color_ranges)
+    def addTimeFrame(self, datas:list()):
+        # print("Controls -->", data)
+        # color_ranges = [(10000, 80000, "#ffbf31")]
+        color_ranges = []
+
+        for data in datas:
+            start = int(data[0])/self.video_slider.maximum()
+            end = int(data[1])/self.video_slider.maximum()
+            timeframe = (start, end, data[2])
+            color_ranges.append(timeframe)
+
+        self.video_slider.setColorRanges(color_ranges)
+
         # self.timeline.addItemsToTimeline(url)
         # pass
 
@@ -47,6 +57,7 @@ class Controls(QWidget):
             self.video_slider.setMaximum(duration)
             self.changeEndLabel(duration)
 
+
     # def setVolumeSlider(self, value):
     #     self.volume_slider.setValue(value)
 
@@ -60,24 +71,8 @@ class Controls(QWidget):
         self.changeStartLabel(pos)
 
     def changeEndLabel(self, duration):
-        self.end_label.setText(self.convert_milliseconds(duration))
+        self.end_label.setText(helper.convert_milliseconds(duration))
 
     def changeStartLabel(self, pos):
-        self.start_label.setText(self.convert_milliseconds(pos))
+        self.start_label.setText(helper.convert_milliseconds(pos))
 
-    def hhmmss(self, ms):
-        # s = 1000, # m = 60000, # h = 360000
-        h, r = divmod(ms, 36000)
-        m, r = divmod(r, 60000)
-        s, _ = divmod(r, 1000)
-        return ("%d:%02d:%02d" % (h,m,s)) if h else ("%d:%02d" % (m,s))
-    
-    def convert_milliseconds(self, ms):
-        total_secs = ms // 1000
-        # Convert total seconds to hours, minutes, and remaining seconds
-        hours = total_secs // 3600
-        mins = (total_secs % 3600) // 60
-        secs = total_secs % 60
-        
-        # Use string formatting to ensure two digits for each unit of time
-        return f"{hours:02d}:{mins:02d}:{secs:02d}"

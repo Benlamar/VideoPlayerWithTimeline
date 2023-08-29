@@ -34,7 +34,6 @@ class Playlist(QWidget):
         self.playlist_model = None
         self.video_list.setModel(self.playlist_model)
 
-
         self.ui.closeButton.clicked.connect(self.close)
 
     def addItemsToPlaylist(self, data):

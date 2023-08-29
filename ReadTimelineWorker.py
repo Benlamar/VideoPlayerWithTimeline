@@ -1,7 +1,7 @@
-from cgi import print_arguments
 from PySide6.QtCore import QRunnable, Signal, QUrl, QObject
 import os
 import glob
+from time import sleep
 
 FILE_TYPE = [".txt", '.json', '.csv']
 
@@ -33,4 +33,5 @@ class ReadTimelineWorker(QRunnable):
                 data = [tuple(line.strip().split()) for line in f]
 
         if len(data):
+            sleep(0.2)
             self.signal.time_list.emit(data)

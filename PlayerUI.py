@@ -10,11 +10,7 @@
 
 from PySide6.QtCore import (QCoreApplication, QMetaObject, QRect,
     QSize, Qt)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QGridLayout, QMainWindow, QMenuBar,
+from PySide6.QtWidgets import (QGridLayout, QMenuBar,
     QSizePolicy, QToolBar, QWidget)
 import resource_rc
 

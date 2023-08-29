@@ -1,9 +1,13 @@
 from PySide6.QtWidgets import QWidget, QStyledItemDelegate, QListView
-from PySide6.QtCore import Qt,  QSize, QUrl
+from PySide6.QtCore import Qt,  QSize, QUrl, QObject, Signal
 from TimelineUI import Ui_TimelineNavigator
 import os
 
 from TimeLineModel import TimeLineModel
+
+class Signals(QObject):
+    jump = Signal(int)
+
 
 class CustomDelegate(QStyledItemDelegate):
     def sizeHint(self, option, index):
@@ -30,13 +34,18 @@ class Timeline(QWidget):
 
         self.ui.closeButton.clicked.connect(self.close)
 
+        # listview signal 
+        self.signal = Signals()
+
     def itemClicked(self):
         index = self.timeline_list.selectedIndexes()
         item = self.tl_model.getTimeline(index[0].row())
-        print(item)
+        self.signal.jump.emit(int(item[0]))
 
     def addItemsToTimeline(self, file_url:list()):
-        print("Time -->",file_url)
+        self.tl_model = TimeLineModel(file_url)
+        self.timeline_list.setModel(self.tl_model)
+
         # basename = os.path.basename(file_location)
         # folder = os.path.dirname(file_location)
         # file_split = basename.split(".")
